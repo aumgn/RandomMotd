@@ -2,17 +2,14 @@ package fr.aumgn.motd;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class MotdsManager {
 
-    private Random rand;
     private List<MotdsProvider> providers;
     private List<ConditionalMotdsProvider> conditionalProviders;
     private int totalSize;
 
     public MotdsManager() {
-        this.rand = new Random();
         this.providers = new ArrayList<MotdsProvider>();
         this.conditionalProviders = new ArrayList<ConditionalMotdsProvider>();
     }
@@ -41,7 +38,7 @@ public class MotdsManager {
         }
 
         // Handles regular providers.
-        int i = rand.nextInt(size());
+        int i = RandomMotd.getRand().nextInt(size());
         for (MotdsProvider provider : providers) {
             int size = provider.size();
             if (i < size) {
