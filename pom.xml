@@ -1,10 +1,12 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	
+	<modelVersion>4.0.0</modelVersion>
+
 	<groupId>fr.aumgn</groupId>
 	<artifactId>randommotd</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	
+
 	<name>RandomMotd</name>
 	<description>Displays random motd in the server list.</description>
 	<url>https://github.com/aumgn/RandomMotd</url>
@@ -34,7 +36,7 @@
 			<comments>A liberal open source license</comments>
 		</license>
 	</licenses>
-	
+
 	<repositories>
 		<repository>
 			<id>bukkit-repo</id>
@@ -73,7 +75,7 @@
 				</includes>
 			</resource>
 		</resources>
-		
+
 		<!-- Plugins -->
 		<plugins>
 			<!-- Compile plugin -->

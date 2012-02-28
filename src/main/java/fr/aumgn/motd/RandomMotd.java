@@ -14,13 +14,13 @@ public class RandomMotd extends JavaPlugin implements Listener {
     private static Random rand = new Random();
     private static Logger logger = Logger.getLogger("Minecraft.RandomMotd");
     private static MotdsManager motdsManager;
-    
+
     public static Random getRand() {
         return rand;
     }
 
     public static void update() {
-        
+
     }
 
     @EventHandler
