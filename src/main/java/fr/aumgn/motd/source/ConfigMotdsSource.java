@@ -1,13 +1,12 @@
-package fr.aumgn.motd.provider;
+package fr.aumgn.motd.source;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.configuration.ConfigurationSection;
 
-import fr.aumgn.motd.MotdsProvider;
 
-public class ConfigMotdsProvider implements MotdsProvider {
+public class ConfigMotdsSource implements MotdsSource {
 
     private class Motd {
         public String content;
@@ -17,7 +16,7 @@ public class ConfigMotdsProvider implements MotdsProvider {
     private List<Motd> motds;
     private int totalSize;
 
-    public ConfigMotdsProvider(List<Object> list) {
+    public ConfigMotdsSource(List<Object> list) {
         load(list);
     }
 

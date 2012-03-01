@@ -6,27 +6,31 @@ import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
+import fr.aumgn.motd.source.ConditionalMotdsSource;
+import fr.aumgn.motd.source.MotdsSource;
+import fr.aumgn.motd.source.MotdsSourceProvider;
+
 public class MotdsManager {
 
-    private List<MotdsProvider> providers;
-    private List<ConditionalMotdsProvider> conditionalProviders;
+    private List<MotdsSource> providers;
+    private List<ConditionalMotdsSource> conditionalProviders;
     private int totalSize;
 
     public MotdsManager() {
-        this.providers = new ArrayList<MotdsProvider>();
-        this.conditionalProviders = new ArrayList<ConditionalMotdsProvider>();
+        this.providers = new ArrayList<MotdsSource>();
+        this.conditionalProviders = new ArrayList<ConditionalMotdsSource>();
         load();
     }
 
     public void load() {
         for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
-            if (plugin instanceof RandomMotdPlugin) {
-                RandomMotdPlugin pl = (RandomMotdPlugin) plugin;
-                List<? extends MotdsProvider> list = pl.getMotdsProviders();
+            if (plugin instanceof MotdsSourceProvider) {
+                MotdsSourceProvider pl = (MotdsSourceProvider) plugin;
+                List<? extends MotdsSource> list = pl.getMotdsProviders();
                 if (list != null) {
                     providers.addAll(list);
                 }
-                List<? extends ConditionalMotdsProvider> cList = pl.getConditionalMotdsProviders();
+                List<? extends ConditionalMotdsSource> cList = pl.getConditionalMotdsProviders();
                 if (cList != null) {
                     conditionalProviders.addAll(cList);
                 }
@@ -37,7 +41,7 @@ public class MotdsManager {
 
     public void update() {
         totalSize = 0;
-        for (MotdsProvider provider : providers) {
+        for (MotdsSource provider : providers) {
             totalSize += provider.size();
         }
     }
@@ -48,7 +52,7 @@ public class MotdsManager {
 
     public String get() {
         // Handles conditional providers.
-        for (ConditionalMotdsProvider provider : conditionalProviders) {
+        for (ConditionalMotdsSource provider : conditionalProviders) {
             if (provider.isActive()) {
                 return provider.get();
             }
@@ -57,7 +61,7 @@ public class MotdsManager {
         // Handles regular providers.
         if (totalSize > 0) {
             int i = RandomMotd.getRand().nextInt(totalSize);
-            for (MotdsProvider provider : providers) {
+            for (MotdsSource provider : providers) {
                 int size = provider.size();
                 if (i < size) {
                     return provider.get(i);
