@@ -1,4 +1,4 @@
-package fr.aumgn.motd.source;
+package fr.aumgn.motd.api;
 
 import java.util.List;
 

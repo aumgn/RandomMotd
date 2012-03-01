@@ -1,14 +1,14 @@
-package fr.aumgn.motd;
+package fr.aumgn.motd.plugin;
 
 import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
-import fr.aumgn.motd.source.MotdsSource;
-import fr.aumgn.motd.source.MotdsSource.Priority;
-import fr.aumgn.motd.source.MotdsSourcePriority;
-import fr.aumgn.motd.source.MotdsSourcesProvider;
+import fr.aumgn.motd.api.MotdsSource;
+import fr.aumgn.motd.api.MotdsSourcePriority;
+import fr.aumgn.motd.api.MotdsSourcesProvider;
+import fr.aumgn.motd.api.MotdsSource.Priority;
 
 class MotdsManager {
 

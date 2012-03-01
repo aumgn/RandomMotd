@@ -1,4 +1,4 @@
-package fr.aumgn.motd;
+package fr.aumgn.motd.plugin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,8 +10,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.server.ServerListPingEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import fr.aumgn.motd.source.MotdsSource;
-import fr.aumgn.motd.source.MotdsSourcesProvider;
+import fr.aumgn.motd.api.MotdsSource;
+import fr.aumgn.motd.api.MotdsSourcesProvider;
 
 public class RandomMotd extends JavaPlugin implements Listener, MotdsSourcesProvider {
 

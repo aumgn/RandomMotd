@@ -1,4 +1,4 @@
-package fr.aumgn.motd.source;
+package fr.aumgn.motd.api;
 
 public interface MotdsSource {
 

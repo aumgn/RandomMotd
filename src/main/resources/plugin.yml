@@ -4,4 +4,4 @@ description: ${project.description}
 author: aumgn
 website: ${project.url}
 
-main: fr.aumgn.motd.RandomMotd
+main: fr.aumgn.motd.plugin.RandomMotd

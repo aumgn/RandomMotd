@@ -1,9 +1,9 @@
-package fr.aumgn.motd;
+package fr.aumgn.motd.plugin;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.aumgn.motd.source.MotdsSource;
+import fr.aumgn.motd.api.MotdsSource;
 
 class SourcesList {
 

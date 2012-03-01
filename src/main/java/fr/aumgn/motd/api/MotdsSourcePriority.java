@@ -1,4 +1,4 @@
-package fr.aumgn.motd.source;
+package fr.aumgn.motd.api;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
