@@ -1,73 +1,78 @@
 package fr.aumgn.motd;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
-import fr.aumgn.motd.source.ConditionalMotdsSource;
 import fr.aumgn.motd.source.MotdsSource;
-import fr.aumgn.motd.source.MotdsSourceProvider;
+import fr.aumgn.motd.source.MotdsSource.Priority;
+import fr.aumgn.motd.source.MotdsSourcePriority;
+import fr.aumgn.motd.source.MotdsSourcesProvider;
 
-public class MotdsManager {
+class MotdsManager {
 
-    private List<MotdsSource> providers;
-    private List<ConditionalMotdsSource> conditionalProviders;
-    private int totalSize;
+    private SourcesList[] sourcesByPriority;
 
     public MotdsManager() {
-        this.providers = new ArrayList<MotdsSource>();
-        this.conditionalProviders = new ArrayList<ConditionalMotdsSource>();
-        load();
-    }
-
-    public void load() {
+        Priority[] priorities = Priority.values();
+        this.sourcesByPriority = new SourcesList[priorities.length];
+        for (Priority priority : priorities) {
+            this.sourcesByPriority[getPriorityIndexFor(priority)] = new SourcesList();
+        }
         for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
-            if (plugin instanceof MotdsSourceProvider) {
-                MotdsSourceProvider pl = (MotdsSourceProvider) plugin;
-                List<? extends MotdsSource> list = pl.getMotdsProviders();
-                if (list != null) {
-                    providers.addAll(list);
-                }
-                List<? extends ConditionalMotdsSource> cList = pl.getConditionalMotdsProviders();
-                if (cList != null) {
-                    conditionalProviders.addAll(cList);
-                }
+            if (plugin instanceof MotdsSourcesProvider) {
+                loadProvider((MotdsSourcesProvider) plugin);
             }
         }
-        update();
     }
 
-    public void update() {
-        totalSize = 0;
-        for (MotdsSource provider : providers) {
-            totalSize += provider.size();
+    private int getPriorityIndexFor(Priority priority) {
+        switch (priority) {
+        case Highest:
+            return 0;
+        case High:
+            return 1;
+        default:
+            return 2;
+        }
+    }
+
+    private int getPriorityIndexFor(MotdsSource source) {
+        MotdsSourcePriority priorityAnnotation = source.getClass().getAnnotation(MotdsSourcePriority.class);
+        MotdsSource.Priority priority;
+        if (priorityAnnotation == null) {
+            priority = MotdsSource.Priority.Normal;
+        } else {
+            priority = priorityAnnotation.value();
+        }
+        return getPriorityIndexFor(priority);        
+    }
+
+    private void loadProvider(MotdsSourcesProvider plugin) {
+        MotdsSourcesProvider sourcesProvider = (MotdsSourcesProvider) plugin;
+        List<? extends MotdsSource> sources = sourcesProvider.getMotdsSources();
+        if (sources != null) {
+            for (MotdsSource source : sources) {
+                int index = getPriorityIndexFor(source);
+                sourcesByPriority[index].add(source);
+            }
         }
     }
 
     public int size() {
+        int totalSize = 0;
+        for (SourcesList sources : sourcesByPriority) {
+            totalSize += sources.size();
+        }
         return totalSize;
     }
 
     public String get() {
-        // Handles conditional providers.
-        for (ConditionalMotdsSource provider : conditionalProviders) {
-            if (provider.isActive()) {
-                return provider.get();
-            }
-        }
-
-        // Handles regular providers.
-        if (totalSize > 0) {
-            int i = RandomMotd.getRand().nextInt(totalSize);
-            for (MotdsSource provider : providers) {
-                int size = provider.size();
-                if (i < size) {
-                    return provider.get(i);
-                } else {
-                    i -= size;
-                }
+        for (SourcesList source : sourcesByPriority) {
+            int size = source.weight();
+            if (size > 0) {
+                return source.get(RandomMotd.getRand().nextInt(size));
             }
         }
 

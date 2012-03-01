@@ -2,19 +2,12 @@ package fr.aumgn.motd.source;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-import org.bukkit.configuration.ConfigurationSection;
+public class ConfigMotdsSource extends SimpleMotdsSource {
 
-
-public class ConfigMotdsSource implements MotdsSource {
-
-    private class Motd {
-        public String content;
-        public int weight;
-    }
-
-    private List<Motd> motds;
-    private int totalSize;
+    private static final String CONTENT_KEY = "content";
+    private static final String WEIGHT_KEY = "weight";
 
     public ConfigMotdsSource(List<Object> list) {
         load(list);
@@ -22,49 +15,37 @@ public class ConfigMotdsSource implements MotdsSource {
 
     public void load(List<Object> list) {
         motds = new ArrayList<Motd>();
-        for (Object motd : list) {
-            if (motd instanceof String) {
-                motds.add(createMotd((String) motd));
-            } else if (motd instanceof ConfigurationSection) {
-                ConfigurationSection motdSection = (ConfigurationSection) motd;
-                if (motdSection.isString("content")) {
-                    String content = motdSection.getString("content");
-                    if (motdSection.isInt("weight")) {
-                        motds.add(createMotd(content, motdSection.getInt("weight")));
-                    } else {
-                        motds.add(createMotd(content));
-                    }
-                }
+        for (Object obj : list) {
+            Motd motd = loadMotd(obj);
+            if (motd != null) {
+                motds.add(motd);
+                totalWeight += motd.weight;
             }
         }
-        System.out.println(motds.size());
     }
 
-    private Motd createMotd(String content, int weight) {
-        Motd motd = new Motd();
-        motd.content = content;
-        motd.weight = weight;
-        totalSize += weight;
-        return motd;
+    @SuppressWarnings("unchecked")
+    public Motd loadMotd(Object obj) {
+        if (obj instanceof String) {
+            return loadMotdFromString((String) obj);
+        }
+        if (obj instanceof Map) {
+            return loadMotdFromMap((Map<String, Object>) obj);
+        }
+        return null;
     }
 
-    private Motd createMotd(String content) {
-        return createMotd(content, 1);
+    private Motd loadMotdFromString(String str) {
+        return new Motd(str);
     }
 
-    @Override
-    public int size() {
-        return totalSize;
-    }
-
-    @Override
-    public String get(int index) {
-        int i = index;
-        for (Motd motd : motds) {
-            if (i < motd.weight) {
-                return motd.content;
+    private Motd loadMotdFromMap(Map<String, Object> map) {
+        if (map.containsKey(CONTENT_KEY) && map.get(CONTENT_KEY) instanceof String) {
+            String content = (String) map.get(CONTENT_KEY);
+            if (map.containsKey(WEIGHT_KEY) && map.get(WEIGHT_KEY) instanceof Integer) {
+                return new Motd(content, (Integer) map.get(WEIGHT_KEY));
             } else {
-                i -= motd.weight;
+                return new Motd(content);
             }
         }
         return null;

@@ -10,22 +10,16 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.server.ServerListPingEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import fr.aumgn.motd.source.ConditionalMotdsSource;
-import fr.aumgn.motd.source.ConfigMotdsSource;
 import fr.aumgn.motd.source.MotdsSource;
-import fr.aumgn.motd.source.MotdsSourceProvider;
+import fr.aumgn.motd.source.MotdsSourcesProvider;
 
-public class RandomMotd extends JavaPlugin implements Listener, MotdsSourceProvider {
+public class RandomMotd extends JavaPlugin implements Listener, MotdsSourcesProvider {
 
     private static Random rand = new Random();
     private static MotdsManager motdsManager;
 
     public static Random getRand() {
         return rand;
-    }
-
-    public static void update() {
-        motdsManager.update();
     }
 
     @EventHandler
@@ -49,18 +43,13 @@ public class RandomMotd extends JavaPlugin implements Listener, MotdsSourceProvi
     }
 
     @Override
-    public List<MotdsSource> getMotdsProviders() {
+    public List<MotdsSource> getMotdsSources() {
         List<Object> list = getConfig().getList("motds");
         if (list != null) {
             List<MotdsSource> providerList = new ArrayList<MotdsSource>(1);
-            providerList.add(new ConfigMotdsSource(list));
+            providerList.add(new DefaultMotdsSource(list));
             return providerList;
         }
-        return null;
-    }
-
-    @Override
-    public List<ConditionalMotdsSource> getConditionalMotdsProviders() {
         return null;
     }
 
