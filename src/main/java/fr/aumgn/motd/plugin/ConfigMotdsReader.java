@@ -1,25 +1,35 @@
-package fr.aumgn.motd.api;
+package fr.aumgn.motd.plugin;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class ConfigMotdsSource extends SimpleMotdsSource {
+import org.bukkit.configuration.Configuration;
 
+import fr.aumgn.motd.api.Motd;
+
+public class ConfigMotdsReader {
+
+    private static final String MOTD_KEY = "motds";
     private static final String CONTENT_KEY = "content";
     private static final String WEIGHT_KEY = "weight";
 
-    public ConfigMotdsSource(List<Object> list) {
-        load(list);
+    private List<Motd> motds;
+
+    public ConfigMotdsReader(Configuration config) {
+        if (config.isList(MOTD_KEY)) {
+            load(config.getList(MOTD_KEY));
+        } else {
+            motds = new ArrayList<Motd>();
+        }
     }
 
-    public void load(List<Object> list) {
+    public void load(List<?> list) {
         motds = new ArrayList<Motd>();
         for (Object obj : list) {
             Motd motd = loadMotd(obj);
             if (motd != null) {
                 motds.add(motd);
-                totalWeight += motd.weight;
             }
         }
     }
@@ -49,6 +59,10 @@ public class ConfigMotdsSource extends SimpleMotdsSource {
             }
         }
         return null;
+    }
+
+    public List<Motd> getMotds() {
+        return motds;
     }
 
 }
