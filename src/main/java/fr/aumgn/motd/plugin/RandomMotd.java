@@ -6,26 +6,43 @@ import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.server.ServerListPingEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import fr.aumgn.motd.api.Motd;
-import fr.aumgn.motd.api.MotdLookupEvent;
+import fr.aumgn.motd.api.MotdsLookupEvent;
+import fr.aumgn.motd.api.MotdsLookupEvent.MotdPriority;
 
 public class RandomMotd extends JavaPlugin implements Listener {
 
     private Random rand = new Random();
     private List<Motd> motds;
+    private Motd forcedMotd; 
+
+    @Override
+    public void onEnable() {
+        int size = reloadMotds();
+        forcedMotd = null;
+        Bukkit.getPluginManager().registerEvents(this, this);
+        Bukkit.getPluginCommand("motd").setExecutor(new MotdCommand(this));
+        getLogger().info("Enabled (" + size + " motds loaded in config.yml).");
+    }
+
+    @Override
+    public void onDisable() {
+        getLogger().info("Disabled.");
+    }
 
     @EventHandler
     public void onServerListPing(ServerListPingEvent event) {
-        MotdLookupEvent motdEvent = new MotdLookupEvent();
+        MotdsLookupEvent motdEvent = new MotdsLookupEvent();
         Bukkit.getPluginManager().callEvent(motdEvent);
         String motdContent = null;
         Collection<Motd> motds = motdEvent.getMotds();
         int index = rand.nextInt(motds.size());
-        for (Motd motd : motdEvent.getMotds()) {
+        for (Motd motd : motds) {
             if (index < motd.getWeight()) {
                 motdContent = motd.getContent();
                 break;
@@ -38,21 +55,26 @@ public class RandomMotd extends JavaPlugin implements Listener {
         }
     }
 
-    @EventHandler
-    public void onMotdLookup(MotdLookupEvent event) {
-        event.registerMotds(motds);
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onForcedMotdLookup(MotdsLookupEvent event) {
+        if (forcedMotd != null) {
+            event.add(forcedMotd, MotdPriority.Highest);
+        }
     }
 
-    @Override
-    public void onEnable() {
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onMotdLookup(MotdsLookupEvent event) {
+        event.add(motds);
+    }
+
+    int reloadMotds() {
+        reloadConfig();
         motds = new ConfigMotdsReader(getConfig()).getMotds();
-        Bukkit.getPluginManager().registerEvents(this, this);
-        getLogger().info("Enabled (" + motds.size() + " motds loaded in config.yml).");
+        return motds.size();
     }
 
-    @Override
-    public void onDisable() {
-        getLogger().info("Disabled.");
+    void forceMotd(Motd motd) {
+        forcedMotd = motd;
     }
 
 }

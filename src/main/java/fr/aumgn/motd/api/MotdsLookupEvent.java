@@ -9,28 +9,31 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 @SuppressWarnings("serial")
-public class MotdLookupEvent extends Event {
+public class MotdsLookupEvent extends Event {
 
     public enum MotdPriority {
-        Normal(0),
-        High(1),
-        Highest(2);
+        Lowest(0),
+        Low(1),
+        Normal(2),
+        High(3),
+        Highest(4);
 
         private char value;
 
         private MotdPriority(int value) {
             this.value = (char) value;
         }
+
     }
 
     private static final HandlerList handlers = new HandlerList();
     private MotdPriority currentPriority;
     private List<Motd> motds;
 
-    public MotdLookupEvent() {
+    public MotdsLookupEvent() {
         super();
         motds = new ArrayList<Motd>();
-        currentPriority = MotdPriority.Normal;
+        currentPriority = MotdPriority.Lowest;
     }
 
     @Override
@@ -42,19 +45,35 @@ public class MotdLookupEvent extends Event {
         return handlers;
     }
 
-    public void registerMotds(List<Motd> motdsToAdd, MotdPriority priority) {
+    private boolean handlePriority(MotdPriority priority) {
         if (priority.value < currentPriority.value) {
-            return;
+            return false;
         }
         if (priority.value > currentPriority.value) {
             motds = new ArrayList<Motd>();
             currentPriority = priority;
         }
-        motds.addAll(motdsToAdd);
+        return true;
     }
 
-    public void registerMotds(List<Motd> motdsToAdd) {
-        this.registerMotds(motdsToAdd, MotdPriority.Normal);
+    public void add(Motd motdToAdd, MotdPriority priority) {
+        if (handlePriority(priority)) {
+            motds.add(motdToAdd);
+        }
+    }
+
+    public void add(Motd motdToAdd) {
+        this.add(motdToAdd, MotdPriority.Lowest);
+    }
+
+    public void add(List<Motd> motdsToAdd, MotdPriority priority) {
+        if (handlePriority(priority)) {
+            motds.addAll(motdsToAdd);
+        }
+    }
+
+    public void add(List<Motd> motdsToAdd) {
+        this.add(motdsToAdd, MotdPriority.Lowest);
     }
 
     public Collection<Motd> getMotds() {

@@ -5,3 +5,13 @@ author: aumgn
 website: ${project.url}
 
 main: fr.aumgn.motd.plugin.RandomMotd
+
+commands:
+    motd:
+        description: "Main motd command"
+        usage: "/<command> reload | set [motd]"
+        permission: "randommotd.command"
+        
+permissions:
+    randommotd.command:
+        default: op
